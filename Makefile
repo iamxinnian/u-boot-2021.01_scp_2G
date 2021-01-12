@@ -17,6 +17,9 @@ NAME =
 # o Look for make include files relative to root of kernel src
 MAKEFLAGS += -rR --include-dir=$(CURDIR)
 
+ARCH := arm
+CROSS_COMPILE :=/usr/local/arm/arm-none-linux-gnueabihf-9.2/bin/arm-none-linux-gnueabihf-
+
 # Determine host architecture
 include include/host_arch.h
 MK_ARCH="${shell uname -m}"

@@ -4967,6 +4967,7 @@
 #define MACH_TYPE_RCPRO                5028
 #define MACH_TYPE_ONBOX                5029
 #define MACH_TYPE_EXYNOS4412           5030
+#define MACH_TYPE_ITOP4412             5030
 #define MACH_TYPE_EXYNOS4413           5031
 #define MACH_TYPE_PELCO_DF20_EVT       5032
 #define MACH_TYPE_LION_DUG             5033
