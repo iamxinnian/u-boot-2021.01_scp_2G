@@ -27,10 +27,11 @@
 #include <asm/arch/dmc.h>
 #include "common_setup.h"
 #include "exynos4412_setup.h"
+#include <asm/arch/itop4412_test.h>
 
 struct mem_timings mem = {
 	.direct_cmd_msr = {
-		DIRECT_CMD1, DIRECT_CMD2, DIRECT_CMD3, DIRECT_CMD4
+		DIRECT_CMD1, DIRECT_CMD2, DIRECT_CMD3, DIRECT_CMD4,DIRECT_CMD5
 	},
 	.timingref = TIMINGREF_VAL,
 	.timingrow = TIMINGROW_VAL,
@@ -92,13 +93,13 @@ static void dmc_init(struct exynos4_dmc *dmc)
 	 * Auto Calibration Start: Enable
 	 */
 	writel(mem.zqcontrol, &dmc->phyzqcontrol);
-	sdelay(0x100000);
+	//sdelay(0x100000);
 
 	/*
 	 * Update DLL Information:
 	 * Force DLL Resyncronization
 	 */
-	phy_control_reset(1, dmc);
+	//phy_control_reset(1, dmc);
 	phy_control_reset(0, dmc);
 
 	/* Set DLL Parameters */
@@ -107,7 +108,7 @@ static void dmc_init(struct exynos4_dmc *dmc)
 	/* DLL Start */
 	writel((mem.control0 | CTRL_START | CTRL_DLL_ON), &dmc->phycontrol0);
 
-	writel(mem.control2, &dmc->phycontrol2);
+	//writel(mem.control2, &dmc->phycontrol2);
 
 	/* Set Clock Ratio of Bus clock to Memory Clock */
 	writel(mem.concontrol, &dmc->concontrol);
@@ -122,7 +123,7 @@ static void dmc_init(struct exynos4_dmc *dmc)
 	writel(mem.memcontrol, &dmc->memcontrol);
 
 	writel(mem.memconfig0, &dmc->memconfig0);
-	writel(mem.memconfig1, &dmc->memconfig1);
+	//writel(mem.memconfig1, &dmc->memconfig1);
 
 	/* Config Precharge Policy */
 	writel(mem.prechconfig, &dmc->prechconfig);
@@ -135,79 +136,55 @@ static void dmc_init(struct exynos4_dmc *dmc)
 	writel(mem.timingdata, &dmc->timingdata);
 	writel(mem.timingpower, &dmc->timingpower);
 
+	 while((dmc->phystatus & 0x7) != 0x7);
+	 writel((dmc->phycontrol0 | ((dmc->phystatus & 0x3FC)<<18))
+	            , &dmc->phycontrol0);
+	 phy_control_reset(1, dmc);
 	/* Chip0: NOP Command: Assert and Hold CKE to high level */
 	writel(DIRECT_CMD_NOP, &dmc->directcmd);
-	sdelay(0x100000);
+	//sdelay(0x100000);
 
 	/* Chip0: EMRS2, EMRS3, EMRS, MRS Commands Using Direct Command */
 	dmc_config_mrs(dmc, 0);
-	sdelay(0x100000);
+	//sdelay(0x100000);
 
 	/* Chip0: ZQINIT */
 	writel(DIRECT_CMD_ZQ, &dmc->directcmd);
-	sdelay(0x100000);
-
-	writel((DIRECT_CMD_NOP | DIRECT_CMD_CHIP1_SHIFT), &dmc->directcmd);
-	sdelay(0x100000);
-
-	/* Chip1: EMRS2, EMRS3, EMRS, MRS Commands Using Direct Command */
-	dmc_config_mrs(dmc, 1);
-	sdelay(0x100000);
-
-	/* Chip1: ZQINIT */
-	writel((DIRECT_CMD_ZQ | DIRECT_CMD_CHIP1_SHIFT), &dmc->directcmd);
-	sdelay(0x100000);
-
-	phy_control_reset(1, dmc);
-	sdelay(0x100000);
+	//sdelay(0x100000);
 
 	/* turn on DREX0, DREX1 */
 	writel((mem.concontrol | AREF_EN), &dmc->concontrol);
+
+	writel((mem.memcontrol | MEMCONTROL_END), &dmc->memcontrol);
 }
 
 void mem_ctrl_init(int reset)
 {
-	struct exynos4_dmc *dmc;
+	struct exynos4_dmc *dmc1 = (struct exynos4_dmc *)samsung_get_base_dmc_ctrl();
+	struct exynos4_dmc *dmc2 = (struct exynos4_dmc *)(samsung_get_base_dmc_ctrl() + DMC_OFFSET);
 
-	/*
-	 * Async bridge configuration at CPU_core:
-	 * 1: half_sync
-	 * 0: full_sync
-	 */
-	writel(1, ASYNC_CONFIG);
-#ifdef CONFIG_ITOP4412
-	/* Interleave: 2Bit, Interleave_bit1: 0x15, Interleave_bit0: 0x7 */
-	writel(APB_SFR_INTERLEAVE_CONF_VAL, EXYNOS4_MIU_BASE +
-		APB_SFR_INTERLEAVE_CONF_OFFSET);
-	/* Update MIU Configuration */
-	writel(APB_SFR_ARBRITATION_CONF_VAL, EXYNOS4_MIU_BASE +
-		APB_SFR_ARBRITATION_CONF_OFFSET);
-#else
-	writel(APB_SFR_INTERLEAVE_CONF_VAL, EXYNOS4_MIU_BASE +
-		APB_SFR_INTERLEAVE_CONF_OFFSET);
-	writel(INTERLEAVE_ADDR_MAP_START_ADDR, EXYNOS4_MIU_BASE +
-		ABP_SFR_INTERLEAVE_ADDRMAP_START_OFFSET);
-	writel(INTERLEAVE_ADDR_MAP_END_ADDR, EXYNOS4_MIU_BASE +
-		ABP_SFR_INTERLEAVE_ADDRMAP_END_OFFSET);
-	writel(INTERLEAVE_ADDR_MAP_EN, EXYNOS4_MIU_BASE +
-		ABP_SFR_SLV_ADDRMAP_CONF_OFFSET);
-#ifdef CONFIG_MIU_LINEAR
-	writel(SLAVE0_SINGLE_ADDR_MAP_START_ADDR, EXYNOS4_MIU_BASE +
-		ABP_SFR_SLV0_SINGLE_ADDRMAP_START_OFFSET);
-	writel(SLAVE0_SINGLE_ADDR_MAP_END_ADDR, EXYNOS4_MIU_BASE +
-		ABP_SFR_SLV0_SINGLE_ADDRMAP_END_OFFSET);
-	writel(SLAVE1_SINGLE_ADDR_MAP_START_ADDR, EXYNOS4_MIU_BASE +
-		ABP_SFR_SLV1_SINGLE_ADDRMAP_START_OFFSET);
-	writel(SLAVE1_SINGLE_ADDR_MAP_END_ADDR, EXYNOS4_MIU_BASE +
-		ABP_SFR_SLV1_SINGLE_ADDRMAP_END_OFFSET);
-	writel(APB_SFR_SLV_ADDR_MAP_CONF_VAL, EXYNOS4_MIU_BASE +
-		ABP_SFR_SLV_ADDRMAP_CONF_OFFSET);
-#endif
-#endif
-	/* DREX0 */
-	dmc = (struct exynos4_dmc *)samsung_get_base_dmc_ctrl();
-	dmc_init(dmc);
-	dmc = (struct exynos4_dmc *)(samsung_get_base_dmc_ctrl()
-					+ DMC_OFFSET);
-	dmc_init(dmc);
+	/*配置内存交错*/
+	writel(APB_SFR_INTERLEAVE_CONF_VAL, &dmc1->ivcontrol);
+	writel(APB_SFR_INTERLEAVE_CONF_VAL, &dmc2->ivcontrol);
+
+	/*初始化内存控制器*/
+	dmc_init(dmc1);
+	dmc_init(dmc2);
+	blink_led2(0x2,0x7f);
+
+	unsigned int *mem1_start_addr=(unsigned int *)0x40000000;
+	unsigned int *mem2_start_addr=(unsigned int *)0x80000000;
+	if(mem_test(mem1_start_addr,0x10000000)==0)
+	{
+		blink_led2(0x4,0x1f);
+	}else{
+		blink_led2(0xffff,0x7f);
+	}
+	if(mem_test(mem2_start_addr,0x10000000)==0)
+	{
+		blink_led2(0x4,0x1f);
+	}else{
+		blink_led2(0xffff,0x7f);
+	}
+	blink_led2(0xffff,0xfffffff0);
 }
