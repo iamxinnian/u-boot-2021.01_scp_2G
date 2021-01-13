@@ -79,6 +79,7 @@ obj-$(CONFIG_CMD_HASH) += hash.o
 obj-$(CONFIG_CMD_IDE) += ide.o disk.o
 obj-$(CONFIG_CMD_INI) += ini.o
 obj-$(CONFIG_CMD_IRQ) += irq.o
+obj-$(CONFIG_CMD_FDISK) += cmd_mmc_fdisk.o
 obj-$(CONFIG_CMD_ITEST) += itest.o
 obj-$(CONFIG_CMD_JFFS2) += jffs2.o
 obj-$(CONFIG_CMD_CRAMFS) += cramfs.o

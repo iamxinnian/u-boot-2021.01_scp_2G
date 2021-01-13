@@ -135,3 +135,42 @@ U_BOOT_CMD(
 	"    - create a directory in 'dev' on 'interface'"
 );
 #endif
+
+#ifdef CONFIG_ITOP4412
+static int do_fat_format(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
+{
+	int dev = 0;
+	int part = 1;
+	struct blk_desc *dev_desc = NULL;
+	struct disk_partition info;
+
+	if (argc < 2) {
+		printf ("usage : fatformat <interface> <dev[:part]>\n");
+		return(0);
+	}
+
+	part = blk_get_device_part_str(argv[1], argv[2], &dev_desc, &info, 1);
+	if (part < 0)
+		return 1;
+	dev = dev_desc->devnum;
+
+	if (dev_desc == NULL) {
+		puts ("\n ** Invalid boot device **\n");
+		return 1;
+	}
+	part_init(dev_desc); //mj fixed the bug
+	printf("Start format MMC%d partition%d ...\n", dev, part);
+	if (fat_format_device(dev_desc, part,info) != 0) {
+		printf("Format failure!!!\n");
+	}
+
+	return 0;
+}
+
+U_BOOT_CMD(
+	fatformat,	3,	0,	do_fat_format,
+	"fatformat - disk format by FAT32",
+	"<interface(only support mmc)> <dev:partition num>\n"
+	" 	- format by FAT32 on 'interface'"
+);
+#endif
