@@ -227,9 +227,11 @@ void usb_hub_reset(void)
 	memset(hub_dev, 0, sizeof(hub_dev));
 #if CONFIG_IS_ENABLED(TARGET_ITOP4412)
 	gpio_direction_output(EXYNOS4X12_GPIO_M33, 0);
+	gpio_direction_output(EXYNOS4X12_GPIO_C01, 0);
 	gpio_direction_output(EXYNOS4X12_GPIO_M24, 0);
 
 	gpio_direction_output(EXYNOS4X12_GPIO_M24, 1);
+	gpio_direction_output(EXYNOS4X12_GPIO_C01, 1);
 	gpio_direction_output(EXYNOS4X12_GPIO_M33, 1);
 #endif
 }

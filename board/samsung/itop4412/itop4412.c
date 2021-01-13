@@ -25,12 +25,21 @@ int exynos_init(void)
 
 	/* USB3503A Reset */
 	gpio_request(EXYNOS4X12_GPIO_M24, "USB3503A Reset");
+
+	/* USB3503A Reference frequency */
+	gpio_request(EXYNOS4X12_GPIO_C01, "DM9621");
 #endif
 	return 0;
 }
 
 int board_usb_init(int index, enum usb_init_type init)
 {
+	gpio_direction_output(EXYNOS4X12_GPIO_M33, 0);
+	gpio_direction_output(EXYNOS4X12_GPIO_C01, 0);
+	gpio_direction_output(EXYNOS4X12_GPIO_M24, 0);
+	gpio_direction_output(EXYNOS4X12_GPIO_M24, 1);
+	gpio_direction_output(EXYNOS4X12_GPIO_C01, 1);
+	gpio_direction_output(EXYNOS4X12_GPIO_M33, 1);
 	return 0;
 }
 

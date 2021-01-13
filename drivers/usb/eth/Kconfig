@@ -13,6 +13,13 @@ config USB_ETHER_ASIX
 	  Say Y here if you would like to support ASIX AX8817X based USB 2.0
 	  Ethernet Devices.
 
+config USB_ETHER_DM9621
+	bool "DM9621 support"
+	depends on USB_HOST_ETHER
+	---help---
+	Say Y here if you would like to support DM9621 based USB 2.0
+	Ethernet Devices.
+
 config USB_ETHER_ASIX88179
 	bool "ASIX AX88179 (USB 3.0) support"
 	depends on USB_HOST_ETHER
