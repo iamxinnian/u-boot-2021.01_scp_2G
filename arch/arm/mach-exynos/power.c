@@ -11,8 +11,13 @@
 static void exynos4_mipi_phy_control(unsigned int dev_index,
 					unsigned int enable)
 {
+#ifdef CONFIG_ITOP4412
+	struct exynos4x12_power *pmu =
+		(struct exynos4x12_power *)samsung_get_base_power();
+#else
 	struct exynos4_power *pmu =
 	    (struct exynos4_power *)samsung_get_base_power();
+#endif
 	unsigned int addr, cfg = 0;
 
 	if (dev_index == 0)
@@ -162,6 +167,23 @@ static void exynos5_set_ps_hold_ctrl(void)
 			EXYNOS_PS_HOLD_CONTROL_DATA_HIGH);
 }
 
+static void exynos4412_set_ps_hold_ctrl(void)
+{
+	unsigned int *ONO=(unsigned int *)0x11000c08;
+	struct exynos4x12_power *power =
+	(struct exynos4x12_power *)samsung_get_base_power();
+
+	/* Set PS-Hold high */
+	unsigned int value = readl(&power->ps_hold_control);
+	value |= (0x1<<8);
+	writel(value, &power->ps_hold_control);
+	value = readl(ONO);
+	value |=(0x1<<5);
+	writel(value, ONO);
+	writel(0, &power->mask_wdt_reset_request);
+	return;
+}
+
 /*
  * Set ps_hold data driving value high
  * This enables the machine to stay powered on
@@ -171,9 +193,15 @@ static void exynos5_set_ps_hold_ctrl(void)
 void set_ps_hold_ctrl(void)
 {
 	if (cpu_is_exynos5())
+	{
 		exynos5_set_ps_hold_ctrl();
+	}else if(cpu_is_exynos4())
+	{
+#ifdef CONFIG_ITOP4412
+	exynos4412_set_ps_hold_ctrl();
+#endif
+	}
 }
-
 
 static void exynos5_set_xclkout(void)
 {
@@ -213,8 +241,13 @@ static uint32_t exynos5_get_reset_status(void)
 
 static uint32_t exynos4_get_reset_status(void)
 {
+#ifdef CONFIG_ITOP4412
+	struct exynos4x12_power *power =
+		(struct exynos4x12_power *)samsung_get_base_power();
+#else
 	struct exynos4_power *power =
 		(struct exynos4_power *)samsung_get_base_power();
+#endif
 
 	return power->inform1;
 }
@@ -238,8 +271,13 @@ static void exynos5_power_exit_wakeup(void)
 
 static void exynos4_power_exit_wakeup(void)
 {
+#ifdef CONFIG_ITOP4412
+	struct exynos4x12_power *power =
+		(struct exynos4x12_power *)samsung_get_base_power();
+#else
 	struct exynos4_power *power =
 		(struct exynos4_power *)samsung_get_base_power();
+#endif
 	typedef void (*resume_func)(void);
 
 	((resume_func)power->inform0)();
