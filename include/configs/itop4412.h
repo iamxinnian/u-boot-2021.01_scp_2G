@@ -17,7 +17,7 @@
 /* ITOP4412 has 4 bank of DRAM */
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
 #define PHYS_SDRAM_1			CONFIG_SYS_SDRAM_BASE
-#define SDRAM_BANK_SIZE			(256 << 20)	/* 256 MB */
+#define SDRAM_BANK_SIZE			(512 << 20)	/* 512 MB */
 
 /* memtest works on */
 #define CONFIG_SYS_LOAD_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x3E00000)
@@ -35,7 +35,7 @@
 
 /* MMC SPL */
 #define COPY_BL2_FNPTR_ADDR	0x02020030
-
+/*
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"loadaddr=0x40007000\0" \
 	"rdaddr=0x48000000\0" \
@@ -66,7 +66,7 @@
 		"fi; " \
 	"fi;" \
 	"load mmc ${mmcdev} ${loadaddr} uImage; bootm ${loadaddr} "
-
+*/
 #define CONFIG_CLK_1000_400_200
 
 /* MIU (Memory Interleaving Unit) */
@@ -74,6 +74,7 @@
 
 #define RESERVE_BLOCK_SIZE		(512)
 #define BL1_SIZE			(8 << 10) /*8 K reserved for BL1*/
+#define SPL_SIZE			(16 << 10) /*16 K reserved for BL2*/
 
 #define CONFIG_SPL_MAX_FOOTPRINT	(14 * 1024)
 
@@ -81,7 +82,7 @@
 
 /* U-Boot copy size from boot Media to DRAM.*/
 #define COPY_BL2_SIZE		0x80000
-#define BL2_START_OFFSET	((CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)/512)
+#define BL2_START_OFFSET	((RESERVE_BLOCK_SIZE+BL1_SIZE+SPL_SIZE)/512)
 #define BL2_SIZE_BLOC_COUNT	(COPY_BL2_SIZE/512)
 
 #endif	/* __CONFIG_H */

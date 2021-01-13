@@ -14,13 +14,13 @@
 	compatible = "samsung,itop4412", "samsung,exynos4412";
 
 	aliases {
-		serial0 = "/serial@13800000";
-		console = "/serial@13810000";
+		serial2 = "/serial@13820000";
+		console = "/serial@13820000";
 		mmc0 = &mshc_0;
 		mmc2 = &sdhci2;
 	};
 
-	serial@13810000 {
+	serial@13820000 {
 		status = "okay";
 	};
 

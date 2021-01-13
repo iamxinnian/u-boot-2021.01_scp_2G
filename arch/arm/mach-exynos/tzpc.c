@@ -34,7 +34,16 @@ void tzpc_init(void)
 		if (cpu_is_exynos5() && (addr == end))
 			break;
 
+#ifndef CONFIG_ITOP4412
 		writel(DECPROTXSET, &tzpc->decprot2set);
+#else
+		if (addr == start)
+		{
+			writel(0xbd, &tzpc->decprot2set);//开放TZASC_SEC_LOCK_(LR,LW, RR, RW)总线
+		}else{
+			writel(DECPROTXSET, &tzpc->decprot2set);
+		}
+#endif
 		writel(DECPROTXSET, &tzpc->decprot3set);
 	}
 }

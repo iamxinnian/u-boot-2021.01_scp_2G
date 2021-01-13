@@ -170,21 +170,4 @@ void mem_ctrl_init(int reset)
 	/*初始化内存控制器*/
 	dmc_init(dmc1);
 	dmc_init(dmc2);
-	blink_led2(0x2,0x7f);
-
-	unsigned int *mem1_start_addr=(unsigned int *)0x40000000;
-	unsigned int *mem2_start_addr=(unsigned int *)0x80000000;
-	if(mem_test(mem1_start_addr,0x10000000)==0)
-	{
-		blink_led2(0x4,0x1f);
-	}else{
-		blink_led2(0xffff,0x7f);
-	}
-	if(mem_test(mem2_start_addr,0x10000000)==0)
-	{
-		blink_led2(0x4,0x1f);
-	}else{
-		blink_led2(0xffff,0x7f);
-	}
-	blink_led2(0xffff,0xfffffff0);
 }
