@@ -27,7 +27,6 @@
 #include <asm/arch/dmc.h>
 #include "common_setup.h"
 #include "exynos4412_setup.h"
-#include <asm/arch/itop4412_test.h>
 
 struct mem_timings mem = {
 	.direct_cmd_msr = {
