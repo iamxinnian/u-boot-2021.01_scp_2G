@@ -17,7 +17,7 @@
 		serial2 = "/serial@13820000";
 		console = "/serial@13820000";
 		mmc0 = &mshc_0;
-		mmc2 = &sdhci2;
+		mmc1 = &sdhci2;
 	};
 
 	serial@13820000 {
@@ -237,7 +237,7 @@
 	samsung,bus-width = <4>;
 	samsung,timing = <1 2 3>;
 	cd-inverted;
-	cd-gpios = <&gpk2 2 0>;
+	cd-gpios = <&gpx0 7 0>;
 	status = "okay";
 };
 

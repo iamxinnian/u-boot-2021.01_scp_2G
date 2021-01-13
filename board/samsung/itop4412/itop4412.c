@@ -19,6 +19,13 @@ u32 get_board_rev(void)
 
 int exynos_init(void)
 {
+#ifdef CONFIG_CMD_USB
+	/* USB3503A Connect */
+	gpio_request(EXYNOS4X12_GPIO_M33, "USB3503A Connect");
+
+	/* USB3503A Reset */
+	gpio_request(EXYNOS4X12_GPIO_M24, "USB3503A Reset");
+#endif
 	return 0;
 }
 

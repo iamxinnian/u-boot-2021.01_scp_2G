@@ -259,6 +259,10 @@ int usb_init(void)
 
 	asynch_allowed = 1;
 
+#ifdef CONFIG_ITOP4412
+	usb_hub_reset();
+#endif
+
 	ret = uclass_get(UCLASS_USB, &uc);
 	if (ret)
 		return ret;
