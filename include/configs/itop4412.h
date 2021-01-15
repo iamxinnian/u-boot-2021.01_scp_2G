@@ -13,6 +13,7 @@
 /* High Level Configuration Options */
 #define CONFIG_EXYNOS4412		1	/* which is a EXYNOS4412 SoC */
 #define CONFIG_ITOP4412			1	/* working with ITOP4412*/
+#define CONFIG_SUPPORT_EMMC_BOOT	1
 
 /* ITOP4412 has 4 bank of DRAM */
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
@@ -27,6 +28,7 @@
 #define CONFIG_SYS_MEM_TOP_HIDE	(1 << 20)	/* ram console */
 
 #define CONFIG_SYS_MONITOR_BASE	0x00000000
+#define CONFIG_SYS_BOOTMAPSZ    0x10000000
 
 /* Power Down Modes */
 #define S5P_CHECK_SLEEP			0x00000BAD
@@ -35,21 +37,23 @@
 
 /* MMC SPL */
 #define COPY_BL2_FNPTR_ADDR	0x02020030
-/*
+
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"loadaddr=0x40007000\0" \
 	"rdaddr=0x48000000\0" \
 	"kerneladdr=0x40007000\0" \
+	"dtbaddr=0x41000000\0" \
 	"ramdiskaddr=0x48000000\0" \
+	"fastbootbuf=" __stringify(CONFIG_FASTBOOT_BUF_ADDR) "\0" \
 	"console=ttySAC2,115200n8\0" \
 	"mmcdev=0\0" \
 	"bootenv=uEnv.txt\0" \
 	"loadbootenv=load mmc ${mmcdev} ${loadaddr} ${bootenv}\0" \
 	"importbootenv=echo Importing environment from mmc ...; " \
 		"env import -t $loadaddr $filesize\0" \
-        "loadbootscript=load mmc ${mmcdev} ${loadaddr} boot.scr\0" \
-        "bootscript=echo Running bootscript from mmc${mmcdev} ...; " \
-                "source ${loadaddr}\0"
+        	"loadbootscript=load mmc ${mmcdev} ${loadaddr} boot.scr\0" \
+        	"bootscript=echo Running bootscript from mmc${mmcdev} ...; " \
+                	"source ${loadaddr}\0"
 #define CONFIG_BOOTCOMMAND \
 	"if mmc rescan; then " \
 		"echo SD/MMC found on device ${mmcdev};" \
@@ -65,8 +69,8 @@
 			"run bootscript; " \
 		"fi; " \
 	"fi;" \
-	"load mmc ${mmcdev} ${loadaddr} uImage; bootm ${loadaddr} "
-*/
+	"mmcpart read kernel ${kerneladdr};" \
+	"mmcpart read dtb ${dtbaddr}; bootm ${kerneladdr} - ${dtbaddr}"
 #define CONFIG_CLK_1000_400_200
 
 /* MIU (Memory Interleaving Unit) */

@@ -13,8 +13,36 @@
 #include <part.h>
 #include <sparse_format.h>
 #include <image-sparse.h>
+#ifdef CONFIG_ITOP4412
+#include <asm/arch/power.h>
+#endif
 
 static int curr_device = -1;
+
+#ifdef CONFIG_ITOP4412
+extern int mmc_send_cmd(struct mmc *mmc,
+	struct mmc_cmd *cmd, struct mmc_data *data);
+static struct mmc *init_mmc_device(int dev, bool force_init);
+u64 get_mmcinfo_capacity(void)
+{
+	struct mmc *mmc;
+
+	if (curr_device < 0) {
+		if (get_mmc_num() > 0)
+			curr_device = 0;
+		else {
+			puts("No MMC device available\n");
+			return 1;
+		}
+	}
+
+	mmc = init_mmc_device(curr_device, false);
+	if (!mmc)
+		return CMD_RET_FAILURE;
+
+	return mmc->capacity >> 30;
+}
+#endif
 
 static void print_mmcinfo(struct mmc *mmc)
 {
@@ -932,6 +960,51 @@ static int do_mmc_boot_wp(struct cmd_tbl *cmdtp, int flag,
 	return CMD_RET_SUCCESS;
 }
 
+#ifdef CONFIG_ITOP4412
+static int do_mmc_lock(struct cmd_tbl *cmdtp, int flag,
+				int argc, char * const argv[])
+{
+	int ret;
+	struct mmc *mmc;
+	struct mmc_cmd cmd;
+
+	if(argc != 2)
+		return 1;
+
+	mmc = init_mmc_device(CONFIG_SYS_MMC_ENV_DEV, true);
+	if (!mmc)
+		return CMD_RET_FAILURE;
+
+	if (!strcmp(argv[1], "open")) {
+		cmd.cmdidx = MMC_CMD_SWITCH;
+		cmd.resp_type = MMC_RSP_R1b;
+		cmd.cmdarg = ((3<<24)|(179<<16)|(((1<<6)|(1<<3)|(1<<0))<<8));
+
+		ret = mmc_send_cmd(mmc, &cmd, NULL);
+		printf("switch to partitions #%d, %s\n",CONFIG_SYS_MMC_ENV_DEV, (!ret) ? "OK" : "ERROR");
+	if(ret)
+		return 1;
+	}else if (!strcmp(argv[1], "close")) {
+		cmd.cmdidx = MMC_CMD_SWITCH;
+		cmd.resp_type = MMC_RSP_R1b;
+		cmd.cmdarg = ((3<<24)|(179<<16)|(((1<<6)|(1<<3)|(0<<0))<<8));
+		ret = mmc_send_cmd(mmc, &cmd, NULL);
+		printf("eMMC CLOSE Success !!!\n");
+		if(ret)
+			return 1;
+	}
+	
+	curr_device = CONFIG_SYS_MMC_ENV_DEV;
+	if (mmc->part_config == MMCPART_NOAVAILABLE)
+		printf("mmc%d is current device\n", curr_device);
+	else
+		printf("mmc%d(part %d) is current device\n",
+		       curr_device, mmc_get_blk_desc(mmc)->hwpart);
+
+	return CMD_RET_SUCCESS;
+}
+#endif
+
 static struct cmd_tbl cmd_mmc[] = {
 	U_BOOT_CMD_MKENT(info, 1, 0, do_mmcinfo, "", ""),
 	U_BOOT_CMD_MKENT(read, 4, 1, do_mmc_read, "", ""),
@@ -963,12 +1036,16 @@ static struct cmd_tbl cmd_mmc[] = {
 #ifdef CONFIG_CMD_BKOPS_ENABLE
 	U_BOOT_CMD_MKENT(bkops-enable, 2, 0, do_mmc_bkops_enable, "", ""),
 #endif
+#ifdef CONFIG_ITOP4412
+	U_BOOT_CMD_MKENT(lock, 2, 0, do_mmc_lock, "", ""),
+#endif
 };
 
 static int do_mmcops(struct cmd_tbl *cmdtp, int flag, int argc,
 		     char *const argv[])
 {
 	struct cmd_tbl *cp;
+	unsigned int boot_mode  = get_boot_mode();
 
 	cp = find_cmd_tbl(argv[1], cmd_mmc, ARRAY_SIZE(cmd_mmc));
 
@@ -983,7 +1060,14 @@ static int do_mmcops(struct cmd_tbl *cmdtp, int flag, int argc,
 
 	if (curr_device < 0) {
 		if (get_mmc_num() > 0) {
+#ifdef CONFIG_ITOP4412
+			if (boot_mode == BOOT_MODE_EMMC_SD)
+				curr_device = 0;
+			else if (boot_mode == BOOT_MODE_SD)
+				curr_device = 1;
+#else
 			curr_device = 0;
+#endif
 		} else {
 			puts("No MMC device available\n");
 			return CMD_RET_FAILURE;
@@ -1037,6 +1121,9 @@ U_BOOT_CMD(
 #ifdef CONFIG_CMD_BKOPS_ENABLE
 	"mmc bkops-enable <dev> - enable background operations handshake on device\n"
 	"   WARNING: This is a write-once setting.\n"
+#endif
+#ifdef CONFIG_ITOP4412
+	"mmc lock <open:close> - lock or unlock Boot area.\n"
 #endif
 	);
 

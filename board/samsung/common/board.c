@@ -54,6 +54,7 @@ __weak int exynos_power_init(void)
  */
 static int get_boot_mmc_dev(void)
 {
+#ifndef CONFIG_ITOP4412
 	u32 mode = readl(EXYNOS4_OP_MODE) & 0x1C;
 
 	if (mode == 0x04)
@@ -61,6 +62,9 @@ static int get_boot_mmc_dev(void)
 
 	/* MMC0: eMMC or unknown */
 	return 0;
+#else
+	return CONFIG_SYS_MMC_ENV_DEV;
+#endif
 }
 
 #if defined CONFIG_EXYNOS_TMU

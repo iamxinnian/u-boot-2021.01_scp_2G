@@ -387,6 +387,20 @@ config PLATFORM_ELFENTRY
 	default "__start" if MIPS
 	default "_start"
 
+menu "ITOP4412 Partition Info"
+
+config PART_KERNEL_SIZE
+	int "kernel part size (unit MB)"
+	depends on TARGET_ITOP4412
+	default 10
+
+config PART_DTB_SIZE
+	int "dtb part size (unit KB)"
+	depends on TARGET_ITOP4412
+	default 512
+
+endmenu
+
 config STACK_SIZE
 	hex "Define max stack size that can be used by U-Boot"
 	default 0x4000000 if ARCH_VERSAL || ARCH_ZYNQMP

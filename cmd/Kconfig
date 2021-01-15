@@ -1153,6 +1153,13 @@ config CMD_PART
 	  Read and display information about the partition table on
 	  various media.
 
+config CMD_MMCPART
+	bool "mmcpart"
+	select HAVE_BLOCK_DEVICE
+	select PARTITION_UUIDS
+	help
+	  Read and write about the partition table on emmc.
+
 config CMD_PCI
 	bool "pci - Access PCI devices"
 	help
