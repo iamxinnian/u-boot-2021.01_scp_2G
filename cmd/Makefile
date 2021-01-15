@@ -115,6 +115,7 @@ obj-$(CONFIG_CMD_ONENAND) += onenand.o
 obj-$(CONFIG_CMD_OSD) += osd.o
 obj-$(CONFIG_CMD_PART) += part.o
 obj-$(CONFIG_CMD_MMCPART) += mmcpart.o
+obj-$(CONFIG_CMD_SDFUSE) += sdfuse.o
 obj-$(CONFIG_CMD_PCAP) += pcap.o
 ifdef CONFIG_PCI
 obj-$(CONFIG_CMD_PCI) += pci.o

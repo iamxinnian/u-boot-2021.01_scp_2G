@@ -837,7 +837,7 @@ config CMD_DM
 
 config CMD_FASTBOOT
 	bool "fastboot - Android fastboot support"
-	depends on FASTBOOT
+	depends on FASTBOOT && (!ITOP4412 || CMD_MMCPART)
 	help
 	  This enables the command "fastboot" which enables the Android
 	  fastboot mode for the platform. Fastboot is a protocol for
@@ -1155,10 +1155,15 @@ config CMD_PART
 
 config CMD_MMCPART
 	bool "mmcpart"
-	select HAVE_BLOCK_DEVICE
-	select PARTITION_UUIDS
+	depends on CMD_MMC
 	help
 	  Read and write about the partition table on emmc.
+
+config CMD_SDFUSE
+	bool "sdfuse"
+	depends on CMD_MMCPART
+	help
+	  Write system from sd card.
 
 config CMD_PCI
 	bool "pci - Access PCI devices"
