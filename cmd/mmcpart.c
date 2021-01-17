@@ -88,7 +88,7 @@ int itop4412_partition_init(void)
 //==================================================================
 #define ext4_printf(args, ...)
 
-static int check_compress_ext4(const void *img_base, const unsigned long parti_size)
+static int check_compress_ext4(const void *img_base, const unsigned long parti_blk)
 {
 	const ext4_file_header *file_header;
 
@@ -119,10 +119,10 @@ static int check_compress_ext4(const void *img_base, const unsigned long parti_s
 		return CMD_RET_FAILURE;
 	}
 
-	if ((parti_size/file_header->block_size)  < file_header->total_blocks) {
+	if (parti_blk/(file_header->block_size/(1<<BLK_SHIFT))  < file_header->total_blocks) {
 		printf("Invalid Volume Size! Image is bigger than partition size!\n");
-		printf("partion size %lu , image size %u \n",
-			(parti_size/file_header->block_size), file_header->total_blocks);
+		printf("partion size %lu ,image size %u \n",
+			parti_blk/(file_header->block_size/(1<<BLK_SHIFT)), file_header->total_blocks);
 		return CMD_RET_FAILURE;
 	}
 
@@ -236,7 +236,7 @@ static int do_write_part(const struct _part_info *part,
 		return do_write_part_boot(part, buf, blk_size);
 	}
 	else if ((flag & PART_FLAG_EXT4) && !(flag & PART_FLAG_FAT)) {
-		if (check_compress_ext4((void *)buf, part->blk_count << BLK_SHIFT))
+		if (check_compress_ext4((void *)buf, part->blk_count))
 			return CMD_RET_FAILURE;
 		return write_compressed_ext4((void *)buf, part->blk_start);
 	}

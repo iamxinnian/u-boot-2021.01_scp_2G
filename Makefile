@@ -18,7 +18,7 @@ NAME =
 MAKEFLAGS += -rR --include-dir=$(CURDIR)
 
 ARCH := arm
-CROSS_COMPILE :=/usr/local/arm/arm-linux-gnueabihf-6.5/bin/arm-linux-gnueabihf-
+CROSS_COMPILE :=/usr/local/arm/arm-none-linux-gnueabihf-9.2/bin/arm-none-linux-gnueabihf-
 
 # Determine host architecture
 include include/host_arch.h
