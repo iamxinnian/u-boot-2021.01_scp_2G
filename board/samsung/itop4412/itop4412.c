@@ -12,10 +12,30 @@
 #include <asm/arch/pinmux.h>
 #include <usb.h>
 #include <usb/dwc2_udc.h>
+#include <asm/arch/clock.h>
+#include <asm/arch/power.h>
 
+void system_clock_init(void);
 u32 get_board_rev(void)
 {
 	return 0;
+}
+
+static void exynos4412_set_ps_hold_ctrl(void)
+{
+	unsigned int *ONO=(unsigned int *)0x11000c08;
+	struct exynos4x12_power *power =
+	(struct exynos4x12_power *)samsung_get_base_power();
+
+	/* Set PS-Hold high */
+	unsigned int value = readl(&power->ps_hold_control);
+	value |= (0x1<<8);
+	writel(value, &power->ps_hold_control);
+	value = readl(ONO);
+	value |=(0x3<<4);
+	writel(value, ONO);
+	writel(0, &power->mask_wdt_reset_request);
+	return;
 }
 
 int exynos_init(void)
@@ -60,6 +80,8 @@ int board_usb_init(int index, enum usb_init_type init)
 #ifdef CONFIG_BOARD_EARLY_INIT_F
 int exynos_early_init_f(void)
 {
+	exynos4412_set_ps_hold_ctrl();
+	system_clock_init();
 	return 0;
 }
 #endif

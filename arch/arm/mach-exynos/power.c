@@ -178,7 +178,7 @@ static void exynos4412_set_ps_hold_ctrl(void)
 	value |= (0x1<<8);
 	writel(value, &power->ps_hold_control);
 	value = readl(ONO);
-	value |=(0x1<<5);
+	value |=(0x3<<4);
 	writel(value, ONO);
 	writel(0, &power->mask_wdt_reset_request);
 	return;

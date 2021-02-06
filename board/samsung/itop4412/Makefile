@@ -7,6 +7,7 @@ ifdef CONFIG_SPL_BUILD
 obj- := __dummy__.o
 
 hostprogs-y := tools/mkitop4412spl
+hostprogs-y += tools/mkitop4412uboot
 always := $(hostprogs-y)
 
 # omit -O2 option to suppress
@@ -16,5 +17,5 @@ always := $(hostprogs-y)
 # Fix the root cause in tools/mkitop4412spl.c and delete the following work-around
 $(obj)/tools/mkitop4412spl: HOSTCFLAGS:=$(filter-out -O2,$(HOSTCFLAGS))
 else
-obj-y	+= itop4412.o
+obj-y	+= itop4412.o clock_init_setup.o
 endif
