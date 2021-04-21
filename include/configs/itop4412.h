@@ -77,17 +77,17 @@
 #define CONFIG_MIU_2BIT_21_7_INTERLEAVED
 
 #define RESERVE_BLOCK_SIZE		(512)
-#define BL1_SIZE			(8 << 10) /*8 K reserved for BL1*/
+#define BL1_SIZE			(15 << 10) /*15 K reserved for BL1*/
 #define SPL_SIZE			(16 << 10) /*16 K reserved for BL2*/
 
 #define CONFIG_SPL_MAX_FOOTPRINT	(14 * 1024)
 
-#define CONFIG_SPL_STACK			0x02040000
+#define CONFIG_SPL_STACK			0x02060000
 #define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR \
 					- GENERATED_GBL_DATA_SIZE)
 
 /* U-Boot copy size from boot Media to DRAM.*/
-#define COPY_BL2_SIZE		0x80000
+#define COPY_BL2_SIZE		0x52000
 #define BL2_START_OFFSET	((RESERVE_BLOCK_SIZE+BL1_SIZE+SPL_SIZE)/512)
 #define BL2_SIZE_BLOC_COUNT	(COPY_BL2_SIZE/512)
 

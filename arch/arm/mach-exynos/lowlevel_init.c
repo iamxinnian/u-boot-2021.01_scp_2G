@@ -196,7 +196,11 @@ int do_lowlevel_init(void)
 	/* Reconfigure secondary cores */
 	secondary_cores_configure();
 #endif
-
+#ifdef CONFIG_ITOP4412
+	writel(0,0x10021174);
+	writel(0,0x100213B8);
+	writel(0,0x10020804);
+#endif
 	reset_status = get_reset_status();
 
 	switch (reset_status) {
@@ -225,7 +229,7 @@ int do_lowlevel_init(void)
 #endif
 #endif
 		mem_ctrl_init(actions & DO_MEM_RESET);
-		tzpc_init();
+		//tzpc_init();
 	}
 
 	return actions & DO_WAKEUP;

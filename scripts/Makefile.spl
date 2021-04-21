@@ -221,7 +221,6 @@ INPUTS-y	+= $(obj)/$(BOARD)-spl.bin
 endif
 
 ifdef CONFIG_ITOP4412
-INPUTS-y	+=$(obj)/u-boot-N-iTOP-4412.bin
 INPUTS-y	+=$(obj)/u-boot-iTOP-4412.bin
 endif
 
@@ -345,15 +344,10 @@ $(obj)/$(BOARD)-spl.bin: $(obj)/u-boot-spl.bin
 endif
 
 ifdef CONFIG_ITOP4412
-$(obj)/u-boot-N-iTOP-4412.bin:$(obj)/$(BOARD)-spl.bin
-	@cat $(objtree)/board/samsung/$(BOARD)/tools/NBL1.bin1 $(objtree)/$(obj)/$(BOARD)-spl.bin \
-	$(objtree)/u-boot.bin > $(objtree)/u-boot-N-iTOP-4412.bin 
-
 $(obj)/u-boot-iTOP-4412.bin:$(obj)/$(BOARD)-spl.bin
 	@$(objtree)/spl/board/samsung/$(BOARD)/tools/mk$(BOARD)uboot
-	@cat $(objtree)/../CodeSign4SecureBoot_SCP/E4412_N.bl1.SCP2G.bin $(objtree)/../CodeSign4SecureBoot_SCP/bl2.bin \
-	$(objtree)/../CodeSign4SecureBoot_SCP/all00_padding.bin $(objtree)/u-boot.bin \
-	$(objtree)/../CodeSign4SecureBoot_SCP/tzsw_SMDK4412_SCP_2GB.bin > $(objtree)/u-boot-iTOP-4412.bin
+	@cat $(objtree)/../CodeSign4SecureBoot_SCP/E4412_N.bl1.SCP2G.bin $(objtree)/$(obj)/$(BOARD)-spl.bin \
+	$(objtree)/u-boot.bin $(objtree)/../CodeSign4SecureBoot_SCP/tzsw_SMDK4412_SCP_2GB.bin > $(objtree)/u-boot-iTOP-4412.bin
 	
 endif
 

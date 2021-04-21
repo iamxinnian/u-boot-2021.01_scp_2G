@@ -61,7 +61,7 @@
 
 /* CLK_DIV_CPU1 */
 #define HPM_RATIO		0x0
-#define COPY_RATIO		0x4
+#define COPY_RATIO		0x0
 #define CORES_RATIO		0x0
 #define CLK_DIV_CPU1_VAL	((CORES_RATIO << 8) | (HPM_RATIO << 4) | (COPY_RATIO))
 

@@ -42,6 +42,11 @@ u32 irom_ptr_table[] = {
 	[USB_INDEX] = 0x02020070,	/* iROM Function Pointer-USB boot*/
 	};
 
+#ifdef CONFIG_ITOP4412
+void load_uboot_image(u32 boot_device);
+void coldboot(u32 boot_device);
+#endif
+
 void *get_irom_func(int index)
 {
 	return (void *)*(u32 *)irom_ptr_table[index];
@@ -183,6 +188,7 @@ static void exynos_spi_copy(unsigned int uboot_size, unsigned int uboot_addr)
 * COPY_BL2_FNPTR_ADDR: Address in iRAM, which Contains
 * Pointer to API (Data transfer from mmc to ram)
 */
+#ifndef CONFIG_ITOP4412
 void copy_uboot_to_ram(void)
 {
 	unsigned int bootmode = BOOT_MODE_OM;
@@ -263,7 +269,26 @@ void copy_uboot_to_ram(void)
 	if (copy_bl2)
 		copy_bl2(offset, size, CONFIG_SYS_TEXT_BASE);
 }
+#else
 
+void copy_uboot_to_ram(void)
+{
+	unsigned int bootmode = BOOT_MODE_OM;
+	if (bootmode == BOOT_MODE_OM)
+		bootmode = get_boot_mode();
+
+	switch (bootmode) {
+	case BOOT_MODE_SD:
+		load_uboot_image(0x0);
+		coldboot(0x0);
+		break;
+	case BOOT_MODE_EMMC_SD:
+		load_uboot_image(0x14);
+		coldboot(0x14);
+		break;
+	}
+}
+#endif
 void memzero(void *s, size_t n)
 {
 	char *ptr = s;
