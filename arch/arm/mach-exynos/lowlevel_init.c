@@ -170,6 +170,10 @@ static void secondary_cores_configure(void)
 extern void relocate_wait_code(void);
 #endif
 
+#if (defined(CONFIG_CPU_FREQ_1400KHZ) && defined(CONFIG_ITOP4412))
+void S5M8767A_spl_init(void);
+#endif
+
 int do_lowlevel_init(void)
 {
 	uint32_t reset_status;
@@ -221,6 +225,11 @@ int do_lowlevel_init(void)
 
 	if (actions & DO_CLOCKS) {
 		system_clock_init();
+
+#if (defined(CONFIG_CPU_FREQ_1400KHZ) && defined(CONFIG_ITOP4412))
+	S5M8767A_spl_init();
+#endif
+
 #ifdef CONFIG_DEBUG_UART
 #if (defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_SERIAL_SUPPORT)) || \
     !defined(CONFIG_SPL_BUILD)

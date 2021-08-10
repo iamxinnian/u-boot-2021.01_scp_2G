@@ -45,7 +45,7 @@
 #define APLL_RATIO		0x1
 #define PCLK_DBG_RATIO		0x1
 #define ATB_RATIO		0x4
-#define PERIPH_RATIO		0x3
+#define PERIPH_RATIO		0x0
 #define COREM1_RATIO		0x7
 #define COREM0_RATIO		0x3
 #define CORE_RATIO		0x0
@@ -568,7 +568,11 @@
 					| (sdiv << 0))
 
 /* APLL_CON0 */
+#ifdef CONFIG_CPU_FREQ_1400KHZ
+#define APLL_MDIV		0xAF
+#else
 #define APLL_MDIV		0x7D
+#endif
 #define APLL_PDIV		0x3
 #define APLL_SDIV		0x0
 #define APLL_CON0_VAL		SET_PLL(APLL_MDIV, APLL_PDIV, APLL_SDIV)

@@ -14,6 +14,7 @@
 #define CONFIG_EXYNOS4412		1	/* which is a EXYNOS4412 SoC */
 #define CONFIG_ITOP4412			1	/* working with ITOP4412*/
 #define CONFIG_SUPPORT_EMMC_BOOT	1
+#define CONFIG_CPU_FREQ_1400KHZ		1
 
 /* ITOP4412 has 4 bank of DRAM */
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
